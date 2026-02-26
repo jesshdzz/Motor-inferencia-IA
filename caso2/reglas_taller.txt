@@ -1,0 +1,10 @@
+correa_suelta -> alternador_roto
+alternador_roto -> bateria_baja
+bateria_baja ∧ luces_tenues -> problema_electrico
+tanque_vacio -> falta_combustible
+problema_electrico -> motor_no_arranca
+falta_combustible -> motor_no_arranca
+motor_no_arranca∧llave_gira_contacto -> llamar_mecanico
+bujias_sucias -> combustion_deficiente
+combustion_deficiente -> humo_negro
+humo_negro ∧ llamar_mecanico -> reparacion_urgente
