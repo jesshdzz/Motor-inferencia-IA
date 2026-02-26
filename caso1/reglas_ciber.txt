@@ -1,0 +1,10 @@
+hace_clic_link_sospechoso -> posible_phishing
+posible_phishing ∧ pide_credenciales -> robo_cuenta
+robo_cuenta -> cambiar_contrasenas
+sistema_lento ∧ aparecen_ventanas_emergentes -> presencia_malware
+presencia_malware -> ejecutar_antivirus
+ejecutar_antivirus ∧ virus_detectado -> archivos_cuarentena
+archivos_cuarentena -> notificar_IT
+notificar_IT -> auditar_red
+cambiar_contrasenas ∧ notificar_IT -> restablecer_seguridad
+auditar_red -> revisar_logs

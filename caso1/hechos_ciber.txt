@@ -1,0 +1,5 @@
+hace_clic_link_sospechoso
+pide_credenciales
+sistema_lento
+aparecen_ventanas_emergentes
+virus_detectado
