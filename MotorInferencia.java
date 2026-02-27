@@ -56,6 +56,60 @@ public class MotorInferencia {
         return true;
     }
 
+    // Encadenamiento hacia atrás
+    public boolean encadenamientoAtras(String objetivo) {
+        System.out.println("\nEncadenamiento hacia atrás:");
+        return probarObjetivo(objetivo, new ArrayList<>());
+    }
+
+    private boolean probarObjetivo(String objetivo, List<String> PilaDeLlamadas) {
+        if (contieneHechos(PilaDeLlamadas, objetivo)) {
+            return false;
+        }
+
+        boolean estaNegado = objetivo.startsWith("NO ");
+        String objetivoBase = estaNegado ? objetivo.substring(3) : objetivo;
+
+        if (contieneHechos(hechos, objetivoBase)) {
+            return !estaNegado;
+        }
+
+        PilaDeLlamadas.add(objetivo);
+        boolean reglaEncontrada = false;
+
+        for (Regla regla : reglas) {
+            if (regla.getConsecuente().equals(objetivo)) {
+                reglaEncontrada = true;
+                System.out.println("\nDisparando regla para el objetivo: " + objetivo + " : " + regla.toString());
+
+                boolean antecedentesVerificados = true;
+                for (String antecedente : regla.getAntecedentes()) {
+                    if (!probarObjetivo(antecedente, new ArrayList<>(PilaDeLlamadas))) {
+                        antecedentesVerificados = false;
+                        break;
+                    }
+                }
+
+                if (antecedentesVerificados) {
+                    System.out.println("Objetivo verificado mediante reglas: " + objetivoBase);
+                    hechos.add(objetivoBase);
+                    return !estaNegado;
+                }
+            }
+        }
+
+        if (!reglaEncontrada) {
+            System.out.print("No se puede deducir '" + objetivoBase + "'. ¿Es esto cierto? (S/N): ");
+            Boolean respuesta = scanner.nextLine().trim().equalsIgnoreCase("s");
+            if (respuesta) {
+                hechos.add(objetivoBase);
+                return !estaNegado;
+            }
+        }
+
+        return estaNegado;
+    }
+
     private boolean contieneHechos(List<String> lista, String hecho) {
         for (String item : lista) {
             if (item.equalsIgnoreCase(hecho)) {
