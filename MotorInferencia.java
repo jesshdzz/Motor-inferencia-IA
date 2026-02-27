@@ -99,7 +99,7 @@ public class MotorInferencia {
         }
 
         if (!reglaEncontrada) {
-            System.out.print("No se puede deducir '" + objetivoBase + "'. ¿Es esto cierto? (S/N): ");
+            System.out.print("No se puede deducir '" + objetivoBase + "'. ¿Es un hecho verdadero? (S/N): ");
             Boolean respuesta = scanner.nextLine().trim().equalsIgnoreCase("s");
             if (respuesta) {
                 hechos.add(objetivoBase);
