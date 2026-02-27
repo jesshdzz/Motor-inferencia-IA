@@ -1,10 +1,10 @@
-hace_clic_link_sospechoso -> posible_phishing
-posible_phishing ∧ pide_credenciales -> robo_cuenta
-robo_cuenta -> cambiar_contrasenas
-sistema_lento ∧ aparecen_ventanas_emergentes -> presencia_malware
-presencia_malware -> ejecutar_antivirus
-ejecutar_antivirus ∧ virus_detectado -> archivos_cuarentena
-archivos_cuarentena -> notificar_IT
-notificar_IT -> auditar_red
-cambiar_contrasenas ∧ notificar_IT -> restablecer_seguridad
-auditar_red -> revisar_logs
+hace clic en un link sospechoso -> posible phishing
+posible phishing ∧ la pagina pide credenciales -> robo de cuenta
+robo de cuenta -> cambiar contrasenas
+el sistema esta lento ∧ aparecen ventanas emergentes -> presencia de malware
+presencia de malware -> ejecutar el antivirus
+ejecutar el antivirus ∧ se marca un virus detectado -> poner los archivos en cuarentena
+poner los archivos en cuarentena -> notificar a IT
+notificar a IT -> auditar la red
+cambiar contrasenas ∧ notificar a IT -> restablecer la seguridad
+auditar la red -> revisar los logs

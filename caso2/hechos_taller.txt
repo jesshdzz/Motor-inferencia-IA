@@ -1,5 +1,5 @@
-llave_gira_contacto
-luces_tenues
-correa_suelta
-tanque_vacio
-bujias_sucias
+la llave gira en el contacto
+las luces se ven tenues
+la correa esta suelta
+el tanque esta vacio
+las bujias estan sucias
