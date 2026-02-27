@@ -22,45 +22,45 @@ public class Main {
 
 
         while (continuar) {
-        String archivoReglas = "";
-        String archivoHechos = "";
+            String archivoReglas = "";
+            String archivoHechos = "";
 
-        System.out.println("\nSeleccione el caso:");
-        System.out.println("1. Analista de ciberseguridad");
-        System.out.println("2. Taller Mecánico");
+            System.out.println("\nSeleccione el caso:");
+            System.out.println("1. Analista de ciberseguridad");
+            System.out.println("2. Taller Mecánico");
             System.out.println("3. Salir");
-        System.out.print("Opción: ");
+            System.out.print("Opción: ");
 
             String opcion1 = scanner.nextLine().trim();
 
-        if (opcion1.equals("1")) {
-            archivoReglas = ARCHIVO_REGLAS_C1;
-            archivoHechos = ARCHIVO_HECHOS_C1;
-        } else if (opcion1.equals("2")) {
-            archivoReglas = ARCHIVO_REGLAS_C2;
-            archivoHechos = ARCHIVO_HECHOS_C2;
+            if (opcion1.equals("1")) {
+                archivoReglas = ARCHIVO_REGLAS_C1;
+                archivoHechos = ARCHIVO_HECHOS_C1;
+            } else if (opcion1.equals("2")) {
+                archivoReglas = ARCHIVO_REGLAS_C2;
+                archivoHechos = ARCHIVO_HECHOS_C2;
             } else if (opcion1.equals("3")) {
                 continuar = false;
                 continue;
-        } else {
+            } else {
                 System.out.println("Opción inválida. Por favor, intente de nuevo.");
                 continue;
-        }
+            }
 
-        List<Regla> reglas = cargarReglas(archivoReglas);
-        List<String> hechos = cargarHechos(archivoHechos);
+            List<Regla> reglas = cargarReglas(archivoReglas);
+            List<String> hechos = cargarHechos(archivoHechos);
 
-        if (reglas.isEmpty()) {
-            System.out.println("Base de conocimientos vacía. Abortando.");
+            if (reglas.isEmpty()) {
+                System.out.println("Base de conocimientos vacía. Abortando.");
                 continue;
-        }
+            }
 
-        MotorInferencia motor = new MotorInferencia(reglas, hechos);
+            MotorInferencia motor = new MotorInferencia(reglas, hechos);
 
-        System.out.println("\nSeleccione el método de inferencia:");
-        System.out.println("1. Encadenamiento hacia Adelante");
-        System.out.println("2. Encadenamiento hacia Atrás");
-        System.out.print("Opción: ");
+            System.out.println("\nSeleccione el método de inferencia:");
+            System.out.println("1. Encadenamiento hacia Adelante");
+            System.out.println("2. Encadenamiento hacia Atrás");
+            System.out.print("Opción: ");
 
             String opcion2 = scanner.nextLine().trim();
 
