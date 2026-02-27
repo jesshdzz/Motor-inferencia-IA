@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Regla {
-    private List<String> antecedentes;
+    private final List<String> antecedentes;
     private String consecuente;
 
     public Regla(String linea) {
@@ -23,12 +23,24 @@ public class Regla {
 
         String[] antecedentes = partes[0].split("∧");
         for (String antecedente : antecedentes) {
-            if (antecedente.trim().isEmpty()) {
+            String antecedenteLimpio = normalizarAntecedente(antecedente);
+            if (antecedenteLimpio.isEmpty()) {
                 throw new IllegalArgumentException("Formato de regla invalido: " + linea + ". Los antecedentes no pueden estar vacios\n");
             }
-            this.antecedentes.add(antecedente.trim());
+            this.antecedentes.add(antecedenteLimpio);
         }
         this.consecuente = partes[1].trim();
+        if (this.consecuente.isEmpty()) {
+            throw new IllegalArgumentException("Formato de regla invalido: " + linea + ". El consecuente no puede estar vacio\n");
+        }
+    }
+
+    private String normalizarAntecedente(String antecedente) {
+        String limpio = antecedente.trim();
+        if (limpio.toLowerCase().startsWith("no ")) {
+            return "!" + limpio.substring(3).trim();
+        }
+        return limpio;
     }
 
     public List<String> getAntecedentes() {
@@ -41,7 +53,15 @@ public class Regla {
 
     @Override
     public String toString() {
-        return "SI " + String.join(" Y ", antecedentes) + " ENTONCES " + consecuente;
+        List<String> legibles = new ArrayList<>();
+        for (String antecedente : antecedentes) {
+            if (antecedente.startsWith("!")) {
+                legibles.add("NO " + antecedente.substring(1));
+            } else {
+                legibles.add(antecedente);
+            }
+        }
+        return "SI " + String.join(" Y ", legibles) + " ENTONCES " + consecuente;
     }
 
 }
