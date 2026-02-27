@@ -20,7 +20,10 @@ public class MotorInferencia {
     // Encadenamiento hacia adelante
     public void encadenamientoAdelante() {
         boolean nuevosHechosAgregados = true;
-        System.out.println("\nEncadenamiento hacia adelante:");
+
+        System.out.println("\n==================================");
+        System.out.println("   Encadenamiento hacia adelante  ");
+        System.out.println("==================================");
 
         while (nuevosHechosAgregados) {
             nuevosHechosAgregados = false;
@@ -29,6 +32,7 @@ public class MotorInferencia {
                 if (contieneHechos(hechos, regla.getConsecuente())) {
                     continue;
                 }
+
                 if (evaluarAntecedentes(regla.getAntecedentes())) {
                     System.out.println("\nDisparando regla: " + regla.toString());
                     hechos.add(regla.getConsecuente());
@@ -37,7 +41,8 @@ public class MotorInferencia {
                 }
             }
         }
-        System.out.println("\nNo hay mas reglas que disparar.");
+        System.out.println("\nNo hay más reglas que disparar.");
+        System.out.println("Hechos finales: " + hechos);
     }
 
     private boolean evaluarAntecedentes(List<String> antecedentes) {
@@ -58,12 +63,17 @@ public class MotorInferencia {
 
     // Encadenamiento hacia atrás
     public boolean encadenamientoAtras(String objetivo) {
-        System.out.println("\nEncadenamiento hacia atrás:");
-        return probarObjetivo(objetivo, new ArrayList<>());
+        System.out.println("\n==================================");
+        System.out.println("    Encadenamiento hacia atrás    ");
+        System.out.println("==================================");
+        boolean resultado = probarObjetivo(objetivo, new ArrayList<>(), 1);
+        return resultado;
     }
 
-    private boolean probarObjetivo(String objetivo, List<String> PilaDeLlamadas) {
+    private boolean probarObjetivo(String objetivo, List<String> PilaDeLlamadas, int nivel) {
+        System.out.println("\n" + "\t".repeat(nivel-1) + "Objetivo actual: '" + objetivo + "'");
         if (contieneHechos(PilaDeLlamadas, objetivo)) {
+            System.out.println("\t".repeat(nivel) + "Ciclo detectado. Abortando rama.");
             return false;
         }
 
@@ -71,6 +81,7 @@ public class MotorInferencia {
         String objetivoBase = estaNegado ? objetivo.substring(3) : objetivo;
 
         if (contieneHechos(hechos, objetivoBase)) {
+            System.out.println("\t".repeat(nivel) + "El hecho '" + objetivoBase + "' ya es conocido\n");
             return !estaNegado;
         }
 
@@ -80,18 +91,20 @@ public class MotorInferencia {
         for (Regla regla : reglas) {
             if (regla.getConsecuente().equals(objetivo)) {
                 reglaEncontrada = true;
-                System.out.println("\nDisparando regla para el objetivo: " + objetivo + " : " + regla.toString());
+                System.out.println("\t".repeat(nivel) + "Disparando regla: " + regla.toString());
 
                 boolean antecedentesVerificados = true;
                 for (String antecedente : regla.getAntecedentes()) {
-                    if (!probarObjetivo(antecedente, new ArrayList<>(PilaDeLlamadas))) {
+                    System.out.println("\t".repeat(nivel) + "Evaluando antecedente: " + antecedente);
+                    if (!probarObjetivo(antecedente, new ArrayList<>(PilaDeLlamadas), nivel + 2)) {
                         antecedentesVerificados = false;
+                        System.out.println("\tAntecedente '" + antecedente + "' falló.");
                         break;
                     }
                 }
 
                 if (antecedentesVerificados) {
-                    System.out.println("Objetivo verificado mediante reglas: " + objetivoBase);
+                    System.out.println("\t".repeat(nivel) + "Objetivo '" + objetivoBase + "' verificado mediante reglas.");
                     hechos.add(objetivoBase);
                     return !estaNegado;
                 }
@@ -99,11 +112,14 @@ public class MotorInferencia {
         }
 
         if (!reglaEncontrada) {
-            System.out.print("No se puede deducir '" + objetivoBase + "'. ¿Es un hecho verdadero? (S/N): ");
+            System.out.print("\t".repeat(nivel) + "No se puede deducir '" + objetivoBase + "'. ¿Es un hecho verdadero? (S/N): ");
             Boolean respuesta = scanner.nextLine().trim().equalsIgnoreCase("s");
             if (respuesta) {
                 hechos.add(objetivoBase);
+                System.out.println("\t".repeat(nivel) + "Hecho '" + objetivoBase + "' confirmado por el usuario.");
                 return !estaNegado;
+            } else {
+                System.out.println("\t".repeat(nivel) + "Hecho '" + objetivoBase + "' negado por el usuario.");
             }
         }
 

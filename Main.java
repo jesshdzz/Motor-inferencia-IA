@@ -67,8 +67,9 @@ public class Main {
             } else if (opcion2.equals("2")) {
                 System.out.print("Ingrese el objetivo a inferir: ");
                 String objetivo = scanner.nextLine().trim();
+
                 Boolean resultado = motor.encadenamientoAtras(objetivo);
-                System.out.println("\nResultado final: El objetivo: " + objetivo + " es " +
+                System.out.println("\nResultado final: El objetivo '" + objetivo + "' es " +
                         (resultado != null && resultado ? "VERDADERO" : "FALSO"));
 
             } else {
