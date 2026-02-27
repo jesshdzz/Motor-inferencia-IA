@@ -19,8 +19,6 @@ public class Main {
         System.out.println("=========================================");
         System.out.println(" Equipo 3: Jesús, Yoosavi, Sonia, Belén\n");
 
-
-
         while (continuar) {
             String archivoReglas = "";
             String archivoHechos = "";
@@ -67,11 +65,11 @@ public class Main {
             if (opcion2.equals("1")) {
                 motor.encadenamientoAdelante();
             } else if (opcion2.equals("2")) {
-                System.out.println("Ingrese el objetivo a inferir: ");
+                System.out.print("Ingrese el objetivo a inferir: ");
                 String objetivo = scanner.nextLine().trim();
-                // Boolean resultado = motor.encadenamientoAtras(objetivo);
-                // System.out.println("\nResultado final: El objetivo: " + objetivo + " es " +
-                // (resultado != null && resultado ? "VERDADERO" : "FALSO"));
+                Boolean resultado = motor.encadenamientoAtras(objetivo);
+                System.out.println("\nResultado final: El objetivo: " + objetivo + " es " +
+                        (resultado != null && resultado ? "VERDADERO" : "FALSO"));
 
             } else {
                 System.out.println("Opción inválida. Volviendo al menú principal.");
