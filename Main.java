@@ -12,14 +12,26 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        boolean continuar = true;
+
+        System.out.println("=========================================");
+        System.out.println("   Bienvenido al Motor de Inferencia   ");
+        System.out.println("=========================================");
+        System.out.println(" Equipo 3: Jesús, Yoosavi, Sonia, Belén\n");
+
+
+
+        while (continuar) {
         String archivoReglas = "";
         String archivoHechos = "";
 
         System.out.println("\nSeleccione el caso:");
         System.out.println("1. Analista de ciberseguridad");
         System.out.println("2. Taller Mecánico");
+            System.out.println("3. Salir");
         System.out.print("Opción: ");
-        String opcion1 = scanner.nextLine();
+
+            String opcion1 = scanner.nextLine().trim();
 
         if (opcion1.equals("1")) {
             archivoReglas = ARCHIVO_REGLAS_C1;
@@ -27,9 +39,12 @@ public class Main {
         } else if (opcion1.equals("2")) {
             archivoReglas = ARCHIVO_REGLAS_C2;
             archivoHechos = ARCHIVO_HECHOS_C2;
+            } else if (opcion1.equals("3")) {
+                continuar = false;
+                continue;
         } else {
-            System.out.println("Opción inválida");
-            return;
+                System.out.println("Opción inválida. Por favor, intente de nuevo.");
+                continue;
         }
 
         List<Regla> reglas = cargarReglas(archivoReglas);
@@ -37,7 +52,7 @@ public class Main {
 
         if (reglas.isEmpty()) {
             System.out.println("Base de conocimientos vacía. Abortando.");
-            return;
+                continue;
         }
 
         MotorInferencia motor = new MotorInferencia(reglas, hechos);
@@ -46,7 +61,36 @@ public class Main {
         System.out.println("1. Encadenamiento hacia Adelante");
         System.out.println("2. Encadenamiento hacia Atrás");
         System.out.print("Opción: ");
-        String opcion2 = scanner.nextLine();
+
+            String opcion2 = scanner.nextLine().trim();
+
+            if (opcion2.equals("1")) {
+                motor.encadenamientoAdelante();
+            } else if (opcion2.equals("2")) {
+                System.out.println("Ingrese el objetivo a inferir: ");
+                String objetivo = scanner.nextLine().trim();
+                // Boolean resultado = motor.encadenamientoAtras(objetivo);
+                // System.out.println("\nResultado final: El objetivo: " + objetivo + " es " +
+                // (resultado != null && resultado ? "VERDADERO" : "FALSO"));
+
+            } else {
+                System.out.println("Opción inválida. Volviendo al menú principal.");
+                continue;
+            }
+
+            System.out.print("\nDesea guardar los hechos inferidos? (S/N): ");
+            if (scanner.nextLine().trim().equalsIgnoreCase("s")) {
+                guardarHechosInferidos(motor.getHechos(), archivoHechos);
+            }
+
+            System.out.print("\nDesea continuar con otro caso? (S/N): ");
+            if (!scanner.nextLine().trim().equalsIgnoreCase("s")) {
+                continuar = false;
+            }
+        }
+
+        scanner.close();
+        System.out.println("\nGracias por usar el motor de inferencia.");
     }
 
     private static List<Regla> cargarReglas(String archivo) {
