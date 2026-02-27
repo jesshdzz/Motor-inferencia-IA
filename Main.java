@@ -82,4 +82,15 @@ public class Main {
 
         return hechos;
     }
+
+    private static void guardarHechosInferidos(List<String> hechos, String archivo) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(archivo))) {
+            for (String hecho : hechos) {
+                pw.println(hecho);
+            }
+            System.out.println("Hechos inferidos guardados en: " + archivo);
+        } catch (Exception e) {
+            System.out.println("Error al guardar los hechos inferidos: " + e.getMessage());
+        }
+    }
 }
