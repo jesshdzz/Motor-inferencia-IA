@@ -5,6 +5,7 @@ public class Main implements InteraccionManual {
 
     private Scanner scanner;
 
+    // Constructor de la clase, inicializa el scanner para leer datos de la consola
     public Main() {
         this.scanner = new Scanner(System.in);
     }
@@ -19,7 +20,8 @@ public class Main implements InteraccionManual {
                     break;
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         Main app = new Main();
         app.iniciar();
@@ -137,12 +139,14 @@ public class Main implements InteraccionManual {
         System.out.println("\nGracias por usar el motor de inferencia.");
     }
 
+    // Le pregunta al usuario si un hecho específico es verdadero en caso de que el motor no pueda deducirlo
     @Override
     public boolean preguntarHechoAlUsuario(String hecho) {
         System.out.print(">>> PREGUNTA: ¿El hecho '" + hecho + "' es verdadero en el problema real? (s/n): ");
         return leerSN().equals("s");
     }
 
+    // Lee y valida la entrada del usuario para asegurar que solo responda con 's' o 'n'
     private String leerSN() {
         while (true) {
             String entrada = scanner.nextLine().trim().toLowerCase();
@@ -154,6 +158,7 @@ public class Main implements InteraccionManual {
         }
     }
 
+    // Permite al usuario ingresar una lista de hechos manualmente escribiéndolos en la consola
     private List<String> capturarHechosManual() {
         List<String> hechos = new java.util.ArrayList<>();
         System.out.println("Ingrese hechos (uno por línea). Escriba FIN para terminar:");

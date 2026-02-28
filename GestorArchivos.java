@@ -7,6 +7,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class GestorArchivos {
 
+    // Abre una ventana visual para que el usuario pueda seleccionar manualmente el
+    // archivo de reglas o hechos (.txt)
     public static String seleccionarArchivoConDialogo(String tipo) {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Seleccione archivo de " + tipo);
@@ -31,6 +33,8 @@ public class GestorArchivos {
         return archivo.getAbsolutePath();
     }
 
+    // Lee un archivo de texto, procesa cada línea válida y crea una lista con los
+    // objetos de tipo 'Regla'
     public static List<Regla> cargarReglas(String rutaRef) {
         List<Regla> reglas = new ArrayList<>();
         Path ruta = resolverRutaArchivo(rutaRef);
@@ -59,6 +63,8 @@ public class GestorArchivos {
         return reglas;
     }
 
+    // Lee un archivo de texto y extrae una lista de las verdades o 'hechos'
+    // iniciales del sistema
     public static List<String> cargarHechos(String rutaRef) {
         List<String> hechos = new ArrayList<>();
         Path ruta = resolverRutaArchivo(rutaRef);
@@ -84,6 +90,8 @@ public class GestorArchivos {
         return hechos;
     }
 
+    // Guarda los hechos actuales (incluyendo los nuevos inferidos) sobreescribiendo
+    // el archivo especificado
     public static void guardarHechos(List<String> hechos, String archivo) {
         Path rutaSalida = resolverRutaGuardado(archivo);
         try (PrintWriter pw = new PrintWriter(new FileWriter(rutaSalida.toFile()))) {
@@ -96,6 +104,8 @@ public class GestorArchivos {
         }
     }
 
+    // Intenta encontrar la ruta real e inteligible de un archivo, ya sea un archivo
+    // directo, en el proyecto, o hacia arriba en los directorios
     private static Path resolverRutaArchivo(String rutaRelativa) {
         if (rutaRelativa == null || rutaRelativa.trim().isEmpty()) {
             return null;
@@ -132,6 +142,8 @@ public class GestorArchivos {
         }
     }
 
+    // Va buscando el archivo iterativamente en las carpetas superiores ('padres')
+    // en caso de no hallarlo en la actual
     private static Path buscarEnPadres(Path inicio, String rutaRelativa) {
         Path actual = inicio;
         for (int i = 0; i < 8 && actual != null; i++) {
@@ -144,6 +156,8 @@ public class GestorArchivos {
         return null;
     }
 
+    // Decide cuál es el lugar correcto donde deben guardarse los archivos para no
+    // perderlos en carpetas de binarios o temporales
     private static Path resolverRutaGuardado(String ruta) {
         Path p = Paths.get(ruta);
         if (p.isAbsolute()) {
@@ -156,6 +170,8 @@ public class GestorArchivos {
         return Paths.get("").toAbsolutePath().resolve(p).normalize();
     }
 
+    // Encuentra la raíz de todo el proyecto (útil para cuando se ejecuta desde un
+    // .jar o desde carpetas anidadas de compilación)
     private static Path resolverDirectorioProyecto() {
         Path desdeCwd = buscarDirectorioProyecto(Paths.get("").toAbsolutePath().normalize());
         if (desdeCwd != null)
@@ -170,6 +186,8 @@ public class GestorArchivos {
         }
     }
 
+    // Identifica el directorio del proyecto reconociendo carpetas o archivos clave
+    // como 'caso1' o 'Main.java'
     private static Path buscarDirectorioProyecto(Path inicio) {
         Path actual = inicio;
         for (int i = 0; i < 10 && actual != null; i++) {

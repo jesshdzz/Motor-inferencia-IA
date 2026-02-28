@@ -54,6 +54,8 @@ public class MotorInferencia {
         return nuevosHechos;
     }
 
+    // Verifica si todos los antecedentes de una regla son verdaderos con lo que
+    // conocemos hasta ahora
     private boolean antecedentesCumplidos(Regla regla) {
         for (String antecedente : regla.getAntecedentes()) {
             if (esNegado(antecedente)) {
@@ -85,6 +87,8 @@ public class MotorInferencia {
         return demostrado;
     }
 
+    // Método recursivo que hace todo el trabajo pesado para demostrar si un
+    // objetivo particular es verdad, falsedad o si hay ciclos
     private boolean demostrarObjetivo(String objetivo, List<String> pila, NodoArbol nodoPadre, int nivel) {
         String prefijo = "  ".repeat(nivel);
         System.out.println(prefijo + "Objetivo -> " + objetivo);
@@ -102,7 +106,8 @@ public class MotorInferencia {
 
         // Nodo actual para el árbol
         NodoArbol nodoActual;
-        // Si el padre ya es el objetivo raíz creado en encadenamientoHaciaAtras, usamos ese.
+        // Si el padre ya es el objetivo raíz creado en encadenamientoHaciaAtras, usamos
+        // ese.
         if (nodoPadre.getDescripcion().equals(objetivo) && nodoPadre.getHijos().isEmpty() && nivel == 0) {
             nodoActual = nodoPadre;
         } else {

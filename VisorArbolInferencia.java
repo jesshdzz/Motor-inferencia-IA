@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class VisorArbolInferencia extends JFrame {
 
+    // Constructor que prepara la ventana interactiva y la vista visual inicial a
+    // partir del árbol lógico de la demostración
     public VisorArbolInferencia(NodoArbol raizLogica) {
         setTitle("Árbol de Inferencia");
         setSize(800, 600);
@@ -29,6 +31,8 @@ public class VisorArbolInferencia extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
+    // Convierte el nodo lógico de nuestra demostración y también le agrega un icono
+    // visual lindo como ⧪, ✅, 🛑, o ❌
     private DefaultMutableTreeNode crearNodoVisual(NodoArbol nodoLogico) {
         if (nodoLogico == null)
             return new DefaultMutableTreeNode("Raíz Nula");
@@ -55,6 +59,8 @@ public class VisorArbolInferencia extends JFrame {
         return nodoVisual;
     }
 
+    // Función estática auxiliar que lanza toda la ventana gráfica de forma segura
+    // en un hilo separado de Swing
     public static void mostrar(NodoArbol raizLogica) {
         if (raizLogica == null) {
             System.out.println("No hay árbol que mostrar.");

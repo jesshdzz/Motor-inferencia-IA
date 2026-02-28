@@ -6,6 +6,8 @@ public class Regla {
     private List<String> antecedentes;
     private String consecuente;
 
+    // Constructor que recibe una línea de texto de una regla y la procesa para
+    // separar antecedentes y consecuente
     public Regla(String linea) {
         String texto = linea;
 
@@ -44,6 +46,8 @@ public class Regla {
         return consecuente;
     }
 
+    // Convierte la regla de nuevo a una cadena de texto legible para mostrarla en
+    // pantalla (ej. 'SI a Y b ENTONCES c')
     @Override
     public String toString() {
         return "SI " + String.join(" Y ", antecedentes) + " ENTONCES " + consecuente;
