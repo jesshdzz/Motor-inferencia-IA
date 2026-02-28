@@ -6,7 +6,7 @@ import java.awt.*;
 public class VisorArbolInferencia extends JFrame {
 
     public VisorArbolInferencia(NodoArbol raizLogica) {
-        setTitle("Árbol de Inferencia (Motor Unificado)");
+        setTitle("Árbol de Inferencia");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);

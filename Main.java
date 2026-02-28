@@ -10,6 +10,17 @@ public class Main implements InteraccionManual {
     }
 
     public static void main(String[] args) {
+        // Establecer el diseño visual nativo de Java
+        // para evitar las advertencias de GTK en distribuciones Linux.
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {}
+
         Main app = new Main();
         app.iniciar();
     }
