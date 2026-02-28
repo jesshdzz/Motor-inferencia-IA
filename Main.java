@@ -105,7 +105,7 @@ public class Main implements InteraccionManual {
                 System.out.print("Ingrese el objetivo a demostrar: ");
                 String objetivo = scanner.nextLine().trim();
                 motor.encadenamientoHaciaAtras(objetivo);
-                ArbolInferenciaGraphviz.mostrar(motor.getArbolInferencia());
+                VisorArbolInferencia.mostrar(motor.getArbolInferencia());
                 System.out.println("\nHechos finales tras el encadenamiento: " + motor.getHechos());
             } else {
                 System.out.println("Opción de inferencia inválida.");
