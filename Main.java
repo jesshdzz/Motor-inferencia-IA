@@ -1,89 +1,120 @@
-import java.util.Scanner;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
-public class Main {
-    final static String ARCHIVO_REGLAS_C1 = "caso1/reglas_ciber.txt";
-    final static String ARCHIVO_HECHOS_C1 = "caso1/hechos_ciber.txt";
+public class Main implements InteraccionManual {
 
-    final static String ARCHIVO_REGLAS_C2 = "caso2/reglas_taller.txt";
-    final static String ARCHIVO_HECHOS_C2 = "caso2/hechos_taller.txt";
+    private Scanner scanner;
+
+    public Main() {
+        this.scanner = new Scanner(System.in);
+    }
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        Main app = new Main();
+        app.iniciar();
+    }
+
+    public void iniciar() {
         boolean continuar = true;
 
         System.out.println("=========================================");
-        System.out.println("   Bienvenido al Motor de Inferencia   ");
+        System.out.println("  Motor de Inferencia - Versión Unificada ");
         System.out.println("=========================================");
         System.out.println(" Equipo 3: Jesús, Yoosavi, Sonia, Belén\n");
 
         while (continuar) {
-            String archivoReglas = "";
-            String archivoHechos = "";
-
-            System.out.println("\nSeleccione el caso:");
-            System.out.println("1. Analista de ciberseguridad");
-            System.out.println("2. Taller Mecánico");
-            System.out.println("3. Salir");
+            System.out.println("\n--- Carga de Base de Conocimientos ---");
+            System.out.println("1. Cargar desde archivos visualmente (Ventanas)");
+            System.out.println("2. Cargar escribiendo rutas (Consola)");
+            System.out.println("3. Cargar usando rutas por defecto del Caso 1 (Ciberseguridad)");
+            System.out.println("4. Cargar usando rutas por defecto del Caso 2 (Taller)");
             System.out.print("Opción: ");
 
-            String opcion1 = scanner.nextLine().trim();
+            String opcionCarga = scanner.nextLine().trim();
+            List<Regla> reglas = null;
+            List<String> hechos = null;
+            String archivoHechosNombre = "hechos.txt";
 
-            if (opcion1.equals("1")) {
-                archivoReglas = ARCHIVO_REGLAS_C1;
-                archivoHechos = ARCHIVO_HECHOS_C1;
-            } else if (opcion1.equals("2")) {
-                archivoReglas = ARCHIVO_REGLAS_C2;
-                archivoHechos = ARCHIVO_HECHOS_C2;
-            } else if (opcion1.equals("3")) {
-                continuar = false;
-                continue;
+            if (opcionCarga.equals("1")) {
+                String rutareglas = GestorArchivos.seleccionarArchivoConDialogo("reglas");
+                if (rutareglas == null)
+                    continue;
+                reglas = GestorArchivos.cargarReglas(rutareglas);
+
+                System.out.print("¿Deseas cargar hechos iniciales desde archivo? (s/n): ");
+                if (leerSN().equals("s")) {
+                    String rutaHechos = GestorArchivos.seleccionarArchivoConDialogo("hechos");
+                    if (rutaHechos != null) {
+                        hechos = GestorArchivos.cargarHechos(rutaHechos);
+                        archivoHechosNombre = rutaHechos;
+                    } else {
+                        hechos = new java.util.ArrayList<>();
+                    }
+                } else {
+                    hechos = capturarHechosManual();
+                }
+
+            } else if (opcionCarga.equals("2")) {
+                System.out.print("Ruta del archivo de Reglas (.txt): ");
+                String rutaReglas = scanner.nextLine().trim();
+                reglas = GestorArchivos.cargarReglas(rutaReglas);
+
+                System.out.print("Ruta del archivo de Hechos (.txt o en blanco para manual): ");
+                String rutaHechos = scanner.nextLine().trim();
+                if (rutaHechos.isEmpty()) {
+                    hechos = capturarHechosManual();
+                } else {
+                    hechos = GestorArchivos.cargarHechos(rutaHechos);
+                    archivoHechosNombre = rutaHechos;
+                }
+            } else if (opcionCarga.equals("3")) {
+                reglas = GestorArchivos.cargarReglas("caso1/reglas_ciber.txt");
+                hechos = GestorArchivos.cargarHechos("caso1/hechos_ciber.txt");
+                archivoHechosNombre = "caso1/hechos_ciber.txt";
+            } else if (opcionCarga.equals("4")) {
+                reglas = GestorArchivos.cargarReglas("caso2/reglas_taller.txt");
+                hechos = GestorArchivos.cargarHechos("caso2/hechos_taller.txt");
+                archivoHechosNombre = "caso2/hechos_taller.txt";
             } else {
-                System.out.println("Opción inválida. Por favor, intente de nuevo.");
+                System.out.println("Opción no válida.");
                 continue;
             }
 
-            List<Regla> reglas = cargarReglas(archivoReglas);
-            List<String> hechos = cargarHechos(archivoHechos);
-
-            if (reglas.isEmpty()) {
-                System.out.println("Base de conocimientos vacía. Abortando.");
+            if (reglas == null || reglas.isEmpty()) {
+                System.out.println("Base de conocimientos sin reglas válidas. Abortando caso actual.");
                 continue;
             }
 
-            MotorInferencia motor = new MotorInferencia(reglas, hechos);
+            MotorInferencia motor = new MotorInferencia(reglas, hechos, this);
 
             System.out.println("\nSeleccione el método de inferencia:");
-            System.out.println("1. Encadenamiento hacia Adelante");
-            System.out.println("2. Encadenamiento hacia Atrás");
+            System.out.println("1. Encadenamiento hacia Adelante (Sacar todas las conclusiones)");
+            System.out.println("2. Encadenamiento hacia Atrás (Probar un objetivo)");
             System.out.print("Opción: ");
 
-            String opcion2 = scanner.nextLine().trim();
+            String opcionInferencia = scanner.nextLine().trim();
 
-            if (opcion2.equals("1")) {
-                motor.encadenamientoAdelante();
-            } else if (opcion2.equals("2")) {
-                System.out.print("Ingrese el objetivo a inferir: ");
+            if (opcionInferencia.equals("1")) {
+                List<String> nuevos = motor.encadenamientoHaciaAdelante();
+                System.out.println("\n[Hechos Iniciales y Finales]: " + motor.getHechos());
+                System.out.println("[Hechos puramente infereidos]: " + nuevos);
+            } else if (opcionInferencia.equals("2")) {
+                System.out.print("Ingrese el objetivo a demostrar: ");
                 String objetivo = scanner.nextLine().trim();
-
-                Boolean resultado = motor.encadenamientoAtras(objetivo);
-                System.out.println("\nResultado final: El objetivo '" + objetivo + "' es " +
-                        (resultado != null && resultado ? "VERDADERO" : "FALSO"));
-
+                motor.encadenamientoHaciaAtras(objetivo);
+                ArbolInferenciaGraphviz.mostrar(motor.getArbolInferencia());
+                System.out.println("\nHechos finales tras el encadenamiento: " + motor.getHechos());
             } else {
-                System.out.println("Opción inválida. Volviendo al menú principal.");
-                continue;
+                System.out.println("Opción de inferencia inválida.");
             }
 
-            System.out.print("\nDesea guardar los hechos inferidos? (S/N): ");
-            if (scanner.nextLine().trim().equalsIgnoreCase("s")) {
-                guardarHechosInferidos(motor.getHechos(), archivoHechos);
+            System.out.print("\n¿Desea guardar la base de hechos actualizada? (s/n): ");
+            if (leerSN().equals("s")) {
+                GestorArchivos.guardarHechos(motor.getHechos(), archivoHechosNombre);
             }
 
-            System.out.print("\nDesea continuar con otro caso? (S/N): ");
-            if (!scanner.nextLine().trim().equalsIgnoreCase("s")) {
+            System.out.print("\n¿Desea continuar con otro caso? (s/n): ");
+            if (leerSN().equals("n")) {
                 continuar = false;
             }
         }
@@ -92,48 +123,37 @@ public class Main {
         System.out.println("\nGracias por usar el motor de inferencia.");
     }
 
-    private static List<Regla> cargarReglas(String archivo) {
-        List<Regla> reglas = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                if (!linea.trim().isEmpty()) {
-                    reglas.add(new Regla(linea));
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error al cargar las reglas: " + e.getMessage());
-        }
-
-        return reglas;
+    // --- Implementación de la Interfaz para Desacoplar Interfaz Gráfica/Consola de
+    // Lógica ---
+    @Override
+    public boolean preguntarHechoAlUsuario(String hecho) {
+        System.out.print(">>> PREGUNTA: ¿El hecho '" + hecho + "' es verdadero en el problema real? (s/n): ");
+        return leerSN().equals("s");
     }
 
-    private static List<String> cargarHechos(String archivo) {
-        List<String> hechos = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                if (!linea.trim().isEmpty()) {
-                    hechos.add(linea.trim());
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("Error al cargar los hechos: " + e.getMessage());
+    // Utilidades Console
+    private String leerSN() {
+        while (true) {
+            String entrada = scanner.nextLine().trim().toLowerCase();
+            if (entrada.equals("s") || entrada.equals("si"))
+                return "s";
+            if (entrada.equals("n") || entrada.equals("no"))
+                return "n";
+            System.out.print("Invalido. Ingrese 's' (Sí) o 'n' (No): ");
         }
+    }
 
+    private List<String> capturarHechosManual() {
+        List<String> hechos = new java.util.ArrayList<>();
+        System.out.println("Ingrese hechos (uno por línea). Escriba FIN para terminar:");
+        while (true) {
+            String hecho = scanner.nextLine().trim();
+            if (hecho.equalsIgnoreCase("FIN"))
+                break;
+            if (!hecho.isEmpty() && !hechos.contains(hecho)) {
+                hechos.add(hecho);
+            }
+        }
         return hechos;
-    }
-
-    private static void guardarHechosInferidos(List<String> hechos, String archivo) {
-        try (PrintWriter pw = new PrintWriter(new FileWriter(archivo))) {
-            for (String hecho : hechos) {
-                pw.println(hecho);
-            }
-            System.out.println("Hechos inferidos guardados en: " + archivo);
-        } catch (Exception e) {
-            System.out.println("Error al guardar los hechos inferidos: " + e.getMessage());
-        }
     }
 }

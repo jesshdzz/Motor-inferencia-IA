@@ -1,137 +1,222 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class MotorInferencia {
-    private List<Regla> reglas;
-    private List<String> hechos;
-    private Scanner scanner;
+    private final List<Regla> reglas;
+    private final List<String> hechos;
+    private NodoArbol raizArbol;
+    private final InteraccionManual interactuador;
 
-    public MotorInferencia(List<Regla> reglas, List<String> hechos) {
+    public MotorInferencia(List<Regla> reglas, List<String> hechos, InteraccionManual interactuador) {
         this.reglas = reglas;
         this.hechos = hechos;
-        this.scanner = new Scanner(System.in);
+        this.interactuador = interactuador;
     }
 
     public List<String> getHechos() {
         return this.hechos;
     }
 
-    // Encadenamiento hacia adelante
-    public void encadenamientoAdelante() {
-        boolean nuevosHechosAgregados = true;
+    public NodoArbol getArbolInferencia() {
+        return this.raizArbol;
+    }
 
-        System.out.println("\n==================================");
-        System.out.println("   Encadenamiento hacia adelante  ");
-        System.out.println("==================================");
+    // --- ENCADENAMIENTO HACIA ADELANTE (Basado en version3) ---
+    public List<String> encadenamientoHaciaAdelante() {
+        List<String> nuevosHechos = new ArrayList<>();
+        boolean huboCambios;
+        int iteracion = 1;
 
-        while (nuevosHechosAgregados) {
-            nuevosHechosAgregados = false;
+        System.out.println("\n=== ENCADENAMIENTO HACIA ADELANTE ===");
+        do {
+            huboCambios = false;
+            System.out.println("\nIteración " + iteracion + ":");
 
             for (Regla regla : reglas) {
-                if (contieneHechos(hechos, regla.getConsecuente())) {
+                System.out.println(" Evaluando regla: " + regla);
+                if (hechos.contains(regla.getConsecuente())) {
+                    System.out.println("   -> No dispara (consecuente ya conocido).");
                     continue;
                 }
 
-                if (evaluarAntecedentes(regla.getAntecedentes())) {
-                    System.out.println("\nDisparando regla: " + regla.toString());
+                if (antecedentesCumplidos(regla)) {
                     hechos.add(regla.getConsecuente());
-                    System.out.println("Nuevo hecho inferido: " + regla.getConsecuente());
-                    nuevosHechosAgregados = true;
+                    nuevosHechos.add(regla.getConsecuente());
+                    huboCambios = true;
+                    System.out.println("   -> ¡Dispara! Nuevo hecho inferido = " + regla.getConsecuente());
+                } else {
+                    System.out.println("   -> No dispara (faltan antecedentes).");
                 }
             }
-        }
-        System.out.println("\nNo hay más reglas que disparar.");
-        System.out.println("Hechos finales: " + hechos);
+            iteracion++;
+        } while (huboCambios);
+
+        return nuevosHechos;
     }
 
-    private boolean evaluarAntecedentes(List<String> antecedentes) {
-        for (String antecedente : antecedentes) {
-            boolean estaNegado = antecedente.startsWith("NO ");
-            String hechoBase = estaNegado ? antecedente.substring(3) : antecedente;
-
-            boolean existeHecho = contieneHechos(hechos, hechoBase);
-            if (estaNegado && existeHecho) {
-                return false;
-            }
-            if (!estaNegado && !existeHecho) {
+    private boolean antecedentesCumplidos(Regla regla) {
+        for (String antecedente : regla.getAntecedentes()) {
+            if (esNegado(antecedente)) {
+                String positivo = quitarNegacion(antecedente);
+                if (hechos.contains(positivo)) {
+                    return false;
+                }
+            } else if (!hechos.contains(antecedente)) {
                 return false;
             }
         }
         return true;
     }
 
-    // Encadenamiento hacia atrás
-    public boolean encadenamientoAtras(String objetivo) {
-        System.out.println("\n==================================");
-        System.out.println("    Encadenamiento hacia atrás    ");
-        System.out.println("==================================");
-        boolean resultado = probarObjetivo(objetivo, new ArrayList<>(), 1);
-        return resultado;
+    // --- ENCADENAMIENTO HACIA ATRAS (Mezcla de version3 lógica y sonia-version
+    // gráfica) ---
+    public boolean encadenamientoHaciaAtras(String objetivo) {
+        System.out.println("\n=== ENCADENAMIENTO HACIA ATRÁS ===");
+        List<String> pila = new ArrayList<>();
+        raizArbol = new NodoArbol(objetivo, false);
+
+        System.out.println("Traza de demostración:");
+        boolean demostrado = demostrarObjetivo(objetivo.trim(), pila, raizArbol, 0);
+
+        if (demostrado) {
+            System.out.println("\n>>> Objetivo demostrado: " + objetivo);
+        } else {
+            System.out.println("\n>>> No fue posible demostrar el objetivo: " + objetivo);
+        }
+        return demostrado;
     }
 
-    private boolean probarObjetivo(String objetivo, List<String> PilaDeLlamadas, int nivel) {
-        System.out.println("\n" + "\t".repeat(nivel-1) + "Objetivo actual: '" + objetivo + "'");
-        if (contieneHechos(PilaDeLlamadas, objetivo)) {
-            System.out.println("\t".repeat(nivel) + "Ciclo detectado. Abortando rama.");
+    private boolean demostrarObjetivo(String objetivo, List<String> pila, NodoArbol nodoPadre, int nivel) {
+        String prefijo = "  ".repeat(nivel);
+        System.out.println(prefijo + "Objetivo -> " + objetivo);
+
+        if (objetivo.isEmpty()) {
             return false;
         }
 
-        boolean estaNegado = objetivo.startsWith("NO ");
-        String objetivoBase = estaNegado ? objetivo.substring(3) : objetivo;
-
-        if (contieneHechos(hechos, objetivoBase)) {
-            System.out.println("\t".repeat(nivel) + "El hecho '" + objetivoBase + "' ya es conocido\n");
-            return !estaNegado;
+        // Manejo de ciclos (Versión 3)
+        if (pila.contains(objetivo)) {
+            System.out.println(prefijo + "  Fallo: ciclo detectado (" + objetivo + ").");
+            nodoPadre.agregarHijo(new NodoArbol("Ciclo detectado: " + objetivo, false));
+            return false;
         }
 
-        PilaDeLlamadas.add(objetivo);
-        boolean reglaEncontrada = false;
+        // Nodo actual para el árbol (sonia-version)
+        NodoArbol nodoActual;
+        // Si el padre ya es el objetivo raíz creado en encadenamientoHaciaAtras, usamos
+        // ese.
+        if (nodoPadre.getDescripcion().equals(objetivo) && nodoPadre.getHijos().isEmpty() && nivel == 0) {
+            nodoActual = nodoPadre;
+        } else {
+            nodoActual = new NodoArbol(objetivo, false);
+            nodoPadre.agregarHijo(nodoActual);
+        }
+
+        // Si es negado (Versión 3)
+        if (esNegado(objetivo)) {
+            String positivo = quitarNegacion(objetivo);
+            System.out.println(prefijo + "  Es negado, intentar demostrar " + positivo + " y negar resultado.");
+            boolean positivoEsVerdadero = demostrarObjetivo(positivo, new ArrayList<>(pila), nodoActual, nivel + 1);
+            boolean resultado = !positivoEsVerdadero;
+
+            if (!resultado) {
+                // Si el hecho positivo (lo contrario) se demostró, entonces el negado falla.
+                System.out.println(
+                        prefijo + "  El hecho positivo '" + positivo + "' es cierto, por lo que el negado falla.");
+                return false;
+            } else {
+                // Si no se demostró el positivo... es momento de preguntar si es un punto
+                // muerto absoluto.
+            }
+        }
+
+        // Si es un hecho conocido positivo
+        if (hechos.contains(objetivo)) {
+            System.out.println(prefijo + "  Hecho conocido: verdadero.");
+            return true;
+        }
+
+        pila.add(objetivo);
+        boolean existeReglaConObjetivo = false;
 
         for (Regla regla : reglas) {
-            if (regla.getConsecuente().equals(objetivo)) {
-                reglaEncontrada = true;
-                System.out.println("\t".repeat(nivel) + "Disparando regla: " + regla.toString());
+            if (!regla.getConsecuente().equals(objetivo)) {
+                continue;
+            }
+            existeReglaConObjetivo = true;
+            System.out.println(prefijo + "  Evaluando regla: " + regla);
 
-                boolean antecedentesVerificados = true;
-                for (String antecedente : regla.getAntecedentes()) {
-                    System.out.println("\t".repeat(nivel) + "Evaluando antecedente: " + antecedente);
-                    if (!probarObjetivo(antecedente, new ArrayList<>(PilaDeLlamadas), nivel + 2)) {
-                        antecedentesVerificados = false;
-                        System.out.println("\tAntecedente '" + antecedente + "' falló.");
-                        break;
-                    }
-                }
+            NodoArbol nodoRegla = new NodoArbol(regla.toString(), true);
+            nodoActual.agregarHijo(nodoRegla);
 
-                if (antecedentesVerificados) {
-                    System.out.println("\t".repeat(nivel) + "Objetivo '" + objetivoBase + "' verificado mediante reglas.");
-                    hechos.add(objetivoBase);
-                    return !estaNegado;
+            boolean todosCumplidos = true;
+            for (String antecedente : regla.getAntecedentes()) {
+                boolean ok = demostrarAntecedente(antecedente, pila, nodoRegla, nivel + 1);
+                if (!ok) {
+                    System.out.println(prefijo + "  Regla falla por antecedente: " + antecedente);
+                    todosCumplidos = false;
+                    break;
                 }
             }
-        }
 
-        if (!reglaEncontrada) {
-            System.out.print("\t".repeat(nivel) + "No se puede deducir '" + objetivoBase + "'. ¿Es un hecho verdadero? (S/N): ");
-            Boolean respuesta = scanner.nextLine().trim().equalsIgnoreCase("s");
-            if (respuesta) {
-                hechos.add(objetivoBase);
-                System.out.println("\t".repeat(nivel) + "Hecho '" + objetivoBase + "' confirmado por el usuario.");
-                return !estaNegado;
-            } else {
-                System.out.println("\t".repeat(nivel) + "Hecho '" + objetivoBase + "' negado por el usuario.");
-            }
-        }
-
-        return estaNegado;
-    }
-
-    private boolean contieneHechos(List<String> lista, String hecho) {
-        for (String item : lista) {
-            if (item.equalsIgnoreCase(hecho)) {
+            if (todosCumplidos) {
+                if (!hechos.contains(objetivo)) {
+                    hechos.add(objetivo);
+                }
+                System.out.println(prefijo + "  Regla satisfecha, se infiere: " + objetivo);
+                pila.remove(pila.size() - 1);
                 return true;
             }
         }
-        return false;
+
+        pila.remove(pila.size() - 1);
+
+        // Si no se puede deducir por ninguna regla o hecho -> Interactuar con el
+        // usuario
+        System.out.println(prefijo + "  Punto muerto para '" + objetivo + "'. Consultando al usuario...");
+
+        boolean respuestaUsuario = interactuador.preguntarHechoAlUsuario(objetivo);
+        if (respuestaUsuario) {
+            hechos.add(objetivo);
+            System.out.println(prefijo + "  Usuario confirma: " + objetivo + " es VERDADERO.");
+            return true;
+        } else {
+            nodoActual.agregarHijo(new NodoArbol("Punto muerto (FALSO): " + objetivo, false));
+            System.out.println(prefijo + "  Usuario confirma: " + objetivo + " es FALSO.");
+            return false;
+        }
+    }
+
+    private boolean demostrarAntecedente(String antecedente, List<String> pila, NodoArbol nodoPadre, int nivel) {
+        String prefijo = "  ".repeat(nivel);
+        System.out.println(prefijo + "Antecedente -> " + antecedente);
+
+        if (esNegado(antecedente)) {
+            String positivo = quitarNegacion(antecedente);
+            // Creamos un nodo para la negación
+            NodoArbol nodoNegado = new NodoArbol("NO " + positivo, false);
+            nodoPadre.agregarHijo(nodoNegado);
+
+            boolean positivoEsVerdadero = demostrarObjetivo(positivo, new ArrayList<>(pila), nodoNegado, nivel + 1);
+            boolean resultado = !positivoEsVerdadero;
+
+            System.out.println(prefijo + "Resultado antecedente negado " + antecedente + ": " + resultado);
+            return resultado;
+        }
+
+        boolean resultado = demostrarObjetivo(antecedente, pila, nodoPadre, nivel + 1);
+        System.out.println(prefijo + "Resultado antecedente " + antecedente + ": " + resultado);
+        return resultado;
+    }
+
+    private boolean esNegado(String termino) {
+        return termino.startsWith("!");
+    }
+
+    private String quitarNegacion(String termino) {
+        if (esNegado(termino)) {
+            return termino.substring(1).trim();
+        }
+        return termino;
     }
 }

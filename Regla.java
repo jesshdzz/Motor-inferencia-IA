@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Regla {
@@ -6,29 +7,34 @@ public class Regla {
     private String consecuente;
 
     public Regla(String linea) {
-        this.antecedentes = new ArrayList<>();
-        parsearRegla(linea);
-    }
+        String texto = linea;
 
-    private void parsearRegla(String linea) {
-        String[] partes = linea.split("->");
-
-        if (partes.length != 2) {
-            throw new IllegalArgumentException("Formato de regla invalido: " + linea + ". Debe tener la forma: [antecedentes] -> [consecuente]\n");
+        // Normalizar sintaxis (Tolerar tanto SI/ENTONCES como ->)
+        if (texto.contains("->")) {
+            texto = texto.replace("->", "ENTONCES");
+        }
+        if (texto.contains("∧")) {
+            texto = texto.replace("∧", "Y");
         }
 
-        if (partes[0].contains(",")) {
-            throw new IllegalArgumentException("Formato de regla invalido: " + linea + ". Utilice '∧' en lugar de ',' para conectar antecedentes\n");
+        if (!texto.contains("ENTONCES")) {
+            throw new IllegalArgumentException("Regla inválida, falta 'ENTONCES' o '->': " + linea);
         }
 
-        String[] antecedentes = partes[0].split("∧");
-        for (String antecedente : antecedentes) {
-            if (antecedente.trim().isEmpty()) {
-                throw new IllegalArgumentException("Formato de regla invalido: " + linea + ". Los antecedentes no pueden estar vacios\n");
-            }
-            this.antecedentes.add(antecedente.trim());
+        String[] partes = texto.split("ENTONCES");
+        if (partes.length < 2) {
+            throw new IllegalArgumentException("Sintaxis incorrecta en: " + linea);
         }
+
+        String parteAntecedentes = partes[0].replace("SI ", "").trim();
         this.consecuente = partes[1].trim();
+
+        // Elimina comas y divide por Y
+        this.antecedentes = new ArrayList<>(Arrays.asList(parteAntecedentes.replace(",", " ").split("\\s+Y\\s+")));
+
+        for (int i = 0; i < antecedentes.size(); i++) {
+            antecedentes.set(i, antecedentes.get(i).trim());
+        }
     }
 
     public List<String> getAntecedentes() {
@@ -43,5 +49,4 @@ public class Regla {
     public String toString() {
         return "SI " + String.join(" Y ", antecedentes) + " ENTONCES " + consecuente;
     }
-
 }
