@@ -137,13 +137,10 @@ public class MotorInferencia {
         }
 
         pila.add(objetivo);
-        boolean existeReglaConObjetivo = false;
-
         for (Regla regla : reglas) {
             if (!regla.getConsecuente().equals(objetivo)) {
                 continue;
             }
-            existeReglaConObjetivo = true;
             System.out.println(prefijo + "  Evaluando regla: " + regla);
 
             NodoArbol nodoRegla = new NodoArbol(regla.toString(), true);

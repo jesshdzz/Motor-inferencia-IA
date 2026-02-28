@@ -18,7 +18,7 @@ public class Main implements InteraccionManual {
         boolean continuar = true;
 
         System.out.println("=========================================");
-        System.out.println("  Motor de Inferencia - Versión Unificada ");
+        System.out.println("           Motor de Inferencia           ");
         System.out.println("=========================================");
         System.out.println(" Equipo 3: Jesús, Yoosavi, Sonia, Belén\n");
 
