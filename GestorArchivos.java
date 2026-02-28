@@ -96,7 +96,6 @@ public class GestorArchivos {
         }
     }
 
-    // Resolutores de ruta ultra-robustos (De version3)
     private static Path resolverRutaArchivo(String rutaRelativa) {
         if (rutaRelativa == null || rutaRelativa.trim().isEmpty()) {
             return null;

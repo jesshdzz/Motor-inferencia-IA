@@ -28,6 +28,7 @@ public class Main implements InteraccionManual {
             System.out.println("2. Cargar escribiendo rutas (Consola)");
             System.out.println("3. Cargar usando rutas por defecto del Caso 1 (Ciberseguridad)");
             System.out.println("4. Cargar usando rutas por defecto del Caso 2 (Taller)");
+            System.out.println("5. Salir");
             System.out.print("Opción: ");
 
             String opcionCarga = scanner.nextLine().trim();
@@ -75,6 +76,8 @@ public class Main implements InteraccionManual {
                 reglas = GestorArchivos.cargarReglas("caso2/reglas_taller.txt");
                 hechos = GestorArchivos.cargarHechos("caso2/hechos_taller.txt");
                 archivoHechosNombre = "caso2/hechos_taller.txt";
+            } else if (opcionCarga.equals("5")) {
+                continuar = false;
             } else {
                 System.out.println("Opción no válida.");
                 continue;
@@ -123,15 +126,12 @@ public class Main implements InteraccionManual {
         System.out.println("\nGracias por usar el motor de inferencia.");
     }
 
-    // --- Implementación de la Interfaz para Desacoplar Interfaz Gráfica/Consola de
-    // Lógica ---
     @Override
     public boolean preguntarHechoAlUsuario(String hecho) {
         System.out.print(">>> PREGUNTA: ¿El hecho '" + hecho + "' es verdadero en el problema real? (s/n): ");
         return leerSN().equals("s");
     }
 
-    // Utilidades Console
     private String leerSN() {
         while (true) {
             String entrada = scanner.nextLine().trim().toLowerCase();

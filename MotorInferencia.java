@@ -21,7 +21,7 @@ public class MotorInferencia {
         return this.raizArbol;
     }
 
-    // --- ENCADENAMIENTO HACIA ADELANTE (Basado en version3) ---
+    // --- ENCADENAMIENTO HACIA ADELANTE ---
     public List<String> encadenamientoHaciaAdelante() {
         List<String> nuevosHechos = new ArrayList<>();
         boolean huboCambios;
@@ -35,7 +35,7 @@ public class MotorInferencia {
             for (Regla regla : reglas) {
                 System.out.println(" Evaluando regla: " + regla);
                 if (hechos.contains(regla.getConsecuente())) {
-                    System.out.println("   -> No dispara (consecuente ya conocido).");
+                    System.out.println("   -> Consecuente ya conocido.");
                     continue;
                 }
 
@@ -43,9 +43,9 @@ public class MotorInferencia {
                     hechos.add(regla.getConsecuente());
                     nuevosHechos.add(regla.getConsecuente());
                     huboCambios = true;
-                    System.out.println("   -> ¡Dispara! Nuevo hecho inferido = " + regla.getConsecuente());
+                    System.out.println("   -> Nuevo hecho inferido = " + regla.getConsecuente());
                 } else {
-                    System.out.println("   -> No dispara (faltan antecedentes).");
+                    System.out.println("   -> Faltan antecedentes.");
                 }
             }
             iteracion++;
@@ -68,14 +68,13 @@ public class MotorInferencia {
         return true;
     }
 
-    // --- ENCADENAMIENTO HACIA ATRAS (Mezcla de version3 lógica y sonia-version
-    // gráfica) ---
+    // --- ENCADENAMIENTO HACIA ATRAS ---
     public boolean encadenamientoHaciaAtras(String objetivo) {
         System.out.println("\n=== ENCADENAMIENTO HACIA ATRÁS ===");
         List<String> pila = new ArrayList<>();
         raizArbol = new NodoArbol(objetivo, false);
 
-        System.out.println("Traza de demostración:");
+        System.out.println("Demostración:");
         boolean demostrado = demostrarObjetivo(objetivo.trim(), pila, raizArbol, 0);
 
         if (demostrado) {
@@ -94,17 +93,16 @@ public class MotorInferencia {
             return false;
         }
 
-        // Manejo de ciclos (Versión 3)
+        // Manejo de ciclos
         if (pila.contains(objetivo)) {
             System.out.println(prefijo + "  Fallo: ciclo detectado (" + objetivo + ").");
             nodoPadre.agregarHijo(new NodoArbol("Ciclo detectado: " + objetivo, false));
             return false;
         }
 
-        // Nodo actual para el árbol (sonia-version)
+        // Nodo actual para el árbol
         NodoArbol nodoActual;
-        // Si el padre ya es el objetivo raíz creado en encadenamientoHaciaAtras, usamos
-        // ese.
+        // Si el padre ya es el objetivo raíz creado en encadenamientoHaciaAtras, usamos ese.
         if (nodoPadre.getDescripcion().equals(objetivo) && nodoPadre.getHijos().isEmpty() && nivel == 0) {
             nodoActual = nodoPadre;
         } else {
@@ -112,7 +110,7 @@ public class MotorInferencia {
             nodoPadre.agregarHijo(nodoActual);
         }
 
-        // Si es negado (Versión 3)
+        // Si es negado
         if (esNegado(objetivo)) {
             String positivo = quitarNegacion(objetivo);
             System.out.println(prefijo + "  Es negado, intentar demostrar " + positivo + " y negar resultado.");
@@ -125,8 +123,7 @@ public class MotorInferencia {
                         prefijo + "  El hecho positivo '" + positivo + "' es cierto, por lo que el negado falla.");
                 return false;
             } else {
-                // Si no se demostró el positivo... es momento de preguntar si es un punto
-                // muerto absoluto.
+                // Si no se demostró el positivo... es momento de preguntar si es un punto muerto absoluto.
             }
         }
 
@@ -168,8 +165,7 @@ public class MotorInferencia {
 
         pila.remove(pila.size() - 1);
 
-        // Si no se puede deducir por ninguna regla o hecho -> Interactuar con el
-        // usuario
+        // Si no se puede deducir por ninguna regla o hecho -> Interactuar con el usuario
         System.out.println(prefijo + "  Punto muerto para '" + objetivo + "'. Consultando al usuario...");
 
         boolean respuestaUsuario = interactuador.preguntarHechoAlUsuario(objetivo);

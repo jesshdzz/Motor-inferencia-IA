@@ -9,7 +9,6 @@ public class Regla {
     public Regla(String linea) {
         String texto = linea;
 
-        // Normalizar sintaxis (Tolerar tanto SI/ENTONCES como ->)
         if (texto.contains("->")) {
             texto = texto.replace("->", "ENTONCES");
         }
