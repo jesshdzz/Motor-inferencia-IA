@@ -1,10 +1,10 @@
-correa_suelta -> alternador_roto
-alternador_roto -> bateria_baja
-bateria_baja ∧ luces_tenues -> problema_electrico
-tanque_vacio -> falta_combustible
-problema_electrico -> motor_no_arranca
-falta_combustible -> motor_no_arranca
-motor_no_arranca∧llave_gira_contacto -> llamar_mecanico
-bujias_sucias -> combustion_deficiente
-combustion_deficiente -> humo_negro
-humo_negro ∧ llamar_mecanico -> reparacion_urgente
+la correa esta suelta -> el alternador esta roto
+el alternador esta roto -> la bateria esta baja
+la bateria esta baja ∧ las luces se ven tenues -> problema electrico
+el tanque esta vacio -> falta de combustible
+problema electrico -> el motor no arranca
+falta de combustible -> el motor no arranca
+el motor no arranca ∧ la llave gira en el contacto -> llamar al mecanico
+las bujias estan sucias -> la combustion es deficiente
+la combustion es deficiente -> humo negro
+humo negro ∧ llamar al mecanico -> reparacion urgente

@@ -1,5 +1,5 @@
-hace_clic_link_sospechoso
-pide_credenciales
-sistema_lento
-aparecen_ventanas_emergentes
-virus_detectado
+hace clic en un link sospechoso
+la pagina pide credenciales
+el sistema esta lento
+aparecen ventanas emergentes
+se marca un virus detectado
